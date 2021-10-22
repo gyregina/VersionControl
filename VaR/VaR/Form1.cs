@@ -16,6 +16,7 @@ namespace VaR
         PortfolioEntities context = new PortfolioEntities();
         List<Tick> Ticks;
         List<PortfolioItem> Portfolio = new List<PortfolioItem>();
+
         public Form1()
         {
             InitializeComponent();
@@ -25,10 +26,30 @@ namespace VaR
 
             GetPortfolioValue();
 
-            var otp = from x in Ticks
-                      where x.Index.Trim().Equals("OTP")
-                      select x;
-            Console.WriteLine("OTP");
+            List<decimal> Nyereségek = new List<decimal>();
+            
+            int intervalum = 30;
+            DateTime kezdőDátum = (from x in Ticks select x.TradingDay).Min();
+            DateTime záróDátum = dateTimePicker1.Value;
+            
+            TimeSpan z = záróDátum - kezdőDátum;
+            for (int i = 0; i < z.Days - intervalum; i++)
+            {
+                DateTime ablakZáró = kezdőDátum.AddDays(i + intervalum);
+                DateTime ablakNyitó = kezdőDátum.AddDays(i);
+                decimal ny = GetPortfolioValue(kezdőDátum.AddDays(i + intervalum))
+                           - GetPortfolioValue(kezdőDátum.AddDays(i));
+                Nyereségek.Add(ny);
+                Console.WriteLine(i + " " + ny);
+            }
+
+            var nyereségekRendezve = (from x in Nyereségek
+                                      orderby x
+                                      select x)
+                                        .ToList();
+            MessageBox.Show(nyereségekRendezve[nyereségekRendezve.Count() / 5].ToString());
+
+
         }
 
         private decimal GetPortfolioValue(DateTime date)
@@ -55,5 +76,6 @@ namespace VaR
 
             dataGridView2.DataSource = Portfolio;
         }
-    }
+
+}
 }
