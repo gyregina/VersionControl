@@ -22,6 +22,29 @@ namespace VaR
             Ticks = context.Ticks.ToList();
             dataGridView1.DataSource = Ticks;
             CreatePortfolio();
+
+            GetPortfolioValue();
+
+            var otp = from x in Ticks
+                      where x.Index.Trim().Equals("OTP")
+                      select x;
+            Console.WriteLine("OTP");
+        }
+
+        private decimal GetPortfolioValue(DateTime date)
+        {
+            decimal value = 0;
+            foreach (var item in Portfolio)
+            {
+                var last = (from x in Ticks
+                            where item.Index == x.Index.Trim()
+                               && date <= x.TradingDay
+                            orderby x.TradingDay
+                            select x)
+                            .First();
+                value += (decimal)last.Price * item.Volume;
+            }
+            return value;
         }
 
         private void CreatePortfolio()
