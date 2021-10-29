@@ -20,15 +20,25 @@ namespace MnbCurrencyReader
     {
         BindingList<RateData> Rates = new BindingList<RateData>();
 
+
         public Form1()
         {
             InitializeComponent();
+            RefreshData();
+
+        }
+
+        private void RefreshData()
+        {
+            Rates.Clear();
             string xmlstring = GetExchangeRates();
             LoadXml(xmlstring);
             dataGridView1.DataSource = Rates;
             Charting();
-
+            RefreshData();
         }
+
+
 
         private void Charting()
         {
@@ -66,16 +76,22 @@ namespace MnbCurrencyReader
             }
         }
 
-        private string GetExchangeRates()
+        string GetExchangeRates()
         {
             MNBArfolyamServiceSoapClient mnBService = new MNBArfolyamServiceSoapClient();
             GetExchangeRatesRequestBody request = new GetExchangeRatesRequestBody();
-            request.currencyNames = "EUR";
-            request.startDate = "2020 - 01 - 01";
-            request.endDate = "2020-06-30";
+            request.currencyNames = (string)comboBox1.SelectedItem; //"EUR";
+            request.startDate = dateTimePicker1.Value.ToString("yyyy-MM-dd");//"2020 - 01 - 01";
+            request.endDate = dateTimePicker2.Value.ToString("yyyy-MM-dd"); //"2020-06-30";
             var response = mnBService.GetExchangeRates(request);
             string result = response.GetExchangeRatesResult;
-            File.WriteAllText("export.xml", result);
+            return result; //File.WriteAllText("export.xml", result);
+        }
+
+
+        private void filterChanged(object sender, EventArgs e)
+        {
+            RefreshData();
         }
     }
 }
