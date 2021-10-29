@@ -1,9 +1,11 @@
-﻿using MnbCurrencyReader.MnbServiceReference;
+﻿using MnbCurrencyReader.Entities;
+using MnbCurrencyReader.MnbServiceReference;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +16,13 @@ namespace MnbCurrencyReader
     
     public partial class Form1 : Form
     {
+        BindingList<RateData> Rates = new BindingList<RateData>();
+
         public Form1()
         {
             InitializeComponent();
             GetExchangeRates();
-
+            dataGridView1.DataSource = Rates;
         }
 
         private void GetExchangeRates()
@@ -30,6 +34,7 @@ namespace MnbCurrencyReader
             request.endDate = "2020-06-30";
             var response = mnBService.GetExchangeRates(request);
             string result = response.GetExchangeRatesResult;
+            File.WriteAllText("export.xml", result);
         }
     }
 }
