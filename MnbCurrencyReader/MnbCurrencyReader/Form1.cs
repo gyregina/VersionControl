@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml;
 
 namespace MnbCurrencyReader
@@ -22,9 +23,27 @@ namespace MnbCurrencyReader
         public Form1()
         {
             InitializeComponent();
-            GetExchangeRates();
+            string xmlstring = GetExchangeRates();
             LoadXml(xmlstring);
             dataGridView1.DataSource = Rates;
+            Charting();
+
+        }
+
+        private void Charting()
+        {
+            chartRateData.DataSource = Rates;
+            Series series = chartRateData.Series[0];
+            series.ChartType = SeriesChartType.Line;
+            series.XValueMember = "Date";
+            series.YValueMembers = "Value";
+            series.BorderWidth = 2;
+            var chartArea = chartRateData.ChartAreas[0];
+            chartArea.AxisX.MajorGrid.Enabled = false;
+            chartArea.AxisY.MajorGrid.Enabled = false;
+            chartArea.AxisY.IsStartedFromZero = false;
+            var legend = chartRateData.Legends[0];
+            legend.Enabled = false;
 
         }
 
@@ -47,7 +66,7 @@ namespace MnbCurrencyReader
             }
         }
 
-        public string GetExchangeRates()
+        private string GetExchangeRates()
         {
             MNBArfolyamServiceSoapClient mnBService = new MNBArfolyamServiceSoapClient();
             GetExchangeRatesRequestBody request = new GetExchangeRatesRequestBody();
