@@ -33,5 +33,10 @@ namespace FactoryPattern.Abstractions
         {
             Left += 1;
         }
+
+        internal void MoveBall()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
