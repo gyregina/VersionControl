@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Simulation.Entities
 {
-    class BirthProbability
+    public class BirthProbability
     {
         public int Age { get; set; }
         public byte Numchild { get; set; }
