@@ -17,13 +17,68 @@ namespace Simulation
         List<Person> Population = new List<Person>();
         List<BirthProbability> BirthProbabilities = new List<BirthProbability>();
         List<DeathProbability> DeathProbabilities = new List<DeathProbability>();
+        Random rng = new Random(1234);
         public Form1()
         {
             InitializeComponent();
-            Population = GetPopulation(@"C:\Users\Regina\source\repos\Simulation_files\nép-teszt.csv");
+            Population = GetPopulation(@"C:\Users\Regina\source\repos\Simulation_files\nép.csv");
             BirthProbabilities = GetBirthProbabilities(@"C:\Users\Regina\source\repos\Simulation_files\születés.csv");
             DeathProbabilities = GetDeathProbabilities(@"C:\Users\Regina\source\repos\Simulation_files\halál.csv");
-            
+
+            for (int year = 2005; year <= 2024; year++)
+            {
+                for (int i = 0; i < Population.Count; i++)
+                {
+                    SimStep(year, Population[i]);
+                }
+
+                int numberOfFemales = (from x in Population
+                                       where x.Gender == Gender.Female && x.IsAlive
+                                       select x).Count();
+                int numberOfMales = (from x in Population
+                                     where x.Gender == Gender.Male && x.IsAlive
+                                     select x).Count();
+                Console.WriteLine(string.Format("Év:{0} Fiúk:{1} Lányok:{2}", year, numberOfMales, numberOfFemales));
+            }
+
+        }
+
+        private void SimStep(int year, Person person)
+        {
+            if (!person.IsAlive)
+            {
+                return;
+            }
+
+            byte age = (byte)(year - person.BirthYear);
+
+            double Pdeath = (from x in DeathProbabilities
+                             where x.Age == age && x.Gender == person.Gender
+                             select x.P).FirstOrDefault();
+            if (rng.NextDouble() <= Pdeath)
+            {
+                person.IsAlive = false;
+            }
+            if (!person.IsAlive || person.Gender == Gender.Male)
+            {
+                return;
+            }
+
+            double Pbirth = (from x in BirthProbabilities
+                             where x.Age == age && x.Numchild == person.NbrOfChildren
+                             select x.P).FirstOrDefault();
+            if (rng.NextDouble() <= Pbirth)
+            {
+                person.NbrOfChildren++;
+                Person Child = new Person();
+
+                Child.IsAlive = true;
+                Child.BirthYear = year;
+                Child.Gender = (Gender)(rng.Next(1, 3));
+                Child.NbrOfChildren = 0;
+                Population.Add(Child);
+
+            }
 
         }
 
@@ -39,8 +94,8 @@ namespace Simulation
                     _population.Add(new Person()
                     {
                         BirthYear = int.Parse(line[0]),
-                        Gender=(Gender)Enum.Parse(typeof(Gender),line[1]),
-                        NbrOfChildren=int.Parse(line[2])
+                        Gender = (Gender)Enum.Parse(typeof(Gender), line[1]),
+                        NbrOfChildren = int.Parse(line[2])
                     });
 
                 }
