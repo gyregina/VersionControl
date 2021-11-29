@@ -36,6 +36,8 @@ namespace Simulation
         {
             richTextBox1.Clear();
             Population.Clear();
+            _males.Clear();
+            _females.Clear();
             záróév = (int)numericUpDown1.Value;
             Population = GetPopulation(textBox1.Text);
             for (int year = 2005; year <= záróév; year++)
@@ -62,7 +64,8 @@ namespace Simulation
         {
             for (int year = 2005; year <= záróév; year++)
             {
-                richTextBox1.Text=(string.Format("Szimulációs év:{0}\n Fiúk:{1}\n Lányok:{2}\n\n", year, _males[year-2005], _females[year-2005]));
+                //Console.WriteLine("Szimulációs év:{0}\n Fiúk:{1}\n Lányok:{2}\n\n", year, _males[year - 2005], _females[year - 2005]);
+                richTextBox1.Text+=(string.Format("Szimulációs év:{0}\n Fiúk:{1}\n Lányok:{2}\n\n", year, _males[year-2005], _females[year-2005]));
             }
             
         }
