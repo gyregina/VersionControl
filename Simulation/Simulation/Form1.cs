@@ -18,14 +18,27 @@ namespace Simulation
         List<BirthProbability> BirthProbabilities = new List<BirthProbability>();
         List<DeathProbability> DeathProbabilities = new List<DeathProbability>();
         Random rng = new Random(1234);
+        List<int> _females = new List<int>();
+        List<int> _males = new List<int>();
+        public int záróév;
+
         public Form1()
         {
             InitializeComponent();
-            Population = GetPopulation(@"C:\Users\Regina\source\repos\Simulation_files\nép.csv");
             BirthProbabilities = GetBirthProbabilities(@"C:\Users\Regina\source\repos\Simulation_files\születés.csv");
             DeathProbabilities = GetDeathProbabilities(@"C:\Users\Regina\source\repos\Simulation_files\halál.csv");
+            numericUpDown1.Minimum = 2005;
+            numericUpDown1.Maximum = 2024;
 
-            for (int year = 2005; year <= 2024; year++)
+        }
+
+        private void Simulation()
+        {
+            richTextBox1.Clear();
+            Population.Clear();
+            záróév = (int)numericUpDown1.Value;
+            Population = GetPopulation(textBox1.Text);
+            for (int year = 2005; year <= záróév; year++)
             {
                 for (int i = 0; i < Population.Count; i++)
                 {
@@ -35,12 +48,23 @@ namespace Simulation
                 int numberOfFemales = (from x in Population
                                        where x.Gender == Gender.Female && x.IsAlive
                                        select x).Count();
+                _females.Add(numberOfFemales);
                 int numberOfMales = (from x in Population
                                      where x.Gender == Gender.Male && x.IsAlive
                                      select x).Count();
-                Console.WriteLine(string.Format("Év:{0} Fiúk:{1} Lányok:{2}", year, numberOfMales, numberOfFemales));
-            }
+                _males.Add(numberOfMales);
 
+            }
+            DisplayResults();
+        }
+
+        public void DisplayResults()
+        {
+            for (int year = 2005; year <= záróév; i++)
+            {
+                richTextBox1.Text=(string.Format("Szimulációs év:{0}\n Fiúk:{1}\n Lányok:{2}\n\n", year, _males[year-2005], _females[year-2005]));
+            }
+            
         }
 
         private void SimStep(int year, Person person)
@@ -147,6 +171,25 @@ namespace Simulation
             }
 
             return _deathProbabilities;
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            Simulation();
+        }
+
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            else
+            {
+                textBox1.Text = ofd.FileName;
+            }
+
         }
     }
 
